@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "permuted_brunnermunzel"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Matthew Corney", email="matthew_corney@yahoo.co.uk" },
 ]

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='permuted_brunnermunzel',
-      version='0.1',
+      version='0.2',
       description='Python implementation of the permuted brunner munzel',
       url='https://github.com/MatthewCorney',
       author='Matthew Corney',
