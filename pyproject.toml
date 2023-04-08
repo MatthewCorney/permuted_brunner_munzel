@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "permuted_brunnermunzel"
+version = "0.0.1"
+authors = [
+  { name="Matthew Corney", email="matthew_corney@yahoo.co.uk" },
+]
+description = "Python implementation of the permuted brunner munzel"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/MatthewCorney/permuted_brunner_munzel"
+"Bug Tracker" = "https://github.com/MatthewCorney/permuted_brunner_munzel"
