@@ -27,6 +27,9 @@ The function returns a tuple of two float values:
 - The second value is the P-value of the test.
 
 # Example
+```
+pip install permuted_brunnermunzel
+```
 
 ```
 from permuted_brunnermunzel import permuted_brunnermunzel
