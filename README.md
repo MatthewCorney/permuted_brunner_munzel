@@ -1,7 +1,9 @@
 #Introduction
-The permuted_brunnermunzel Python function can be used to perform a permutation-based test for the problem of independent two-sample test. The function is an implementation of the permuted Brunner-Munzel test, and can compute two-sided, greater, or less tests, depending on the input argument. The function also allows the user to specify the estimator of the difference of the location shifts of the two distributions, as well as the policy for handling missing values (NaNs) in the input data.
+This package is an implementation of the permuted version of the Brunner-Munzel test is a nonparametric test.
+The Permuted Brunner-Munzel is best suited to cases where the number of observations in one of the groups is below 10 and
+ideally above 7
 
-This is a copy of the R/Fortran implementation found here https://cran.r-project.org/web/packages/brunnermunzel/index.html
+This is a reimplementation of the R/Fortran implementation found here https://cran.r-project.org/web/packages/brunnermunzel/index.html . This is for cases where is it not possible or complicated to call R from python
 
 #Dependencies
 The function requires the following Python packages:
@@ -29,12 +31,13 @@ The function returns a tuple of two float values:
 ```
 from permuted_brunnermunzel import permuted_brunnermunzel
 
-x = [1, 2, 3, 4, 5]
-y = [3, 4, 5, 6, 7]
+x = [0, 0, 0, 1, 1, 1, 0]
+y = [30, 20, 19, 18, 15, 10, ]
 
-result = permuted_brunnermunzel(x, y, alternative="two_sided", nan_policy="propagate", est="original", force=False)
+result = permuted_brunnermunzel(x, y, alternative="less", nan_policy="propagate", est="original", force=False)
 print(result)
 ```
+
 ```
-(0.4444444444444444, 0.42000000000000004)
+(0.8571428571428571, 0.0005827505827505828)
 ```
