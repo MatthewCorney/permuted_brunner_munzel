@@ -1,11 +1,11 @@
-#Introduction
+# Introduction
 This package is an implementation of the permuted version of the Brunner-Munzel test is a nonparametric test.
 The Permuted Brunner-Munzel is best suited to cases where the number of observations in one of the groups is below 10 and
 ideally above 7
 
 This is a reimplementation of the R/Fortran implementation found here https://cran.r-project.org/web/packages/brunnermunzel/index.html . This is for cases where is it not possible or complicated to call R from python
 
-#Dependencies
+# Dependencies
 The function requires the following Python packages:
 
 - numpy
