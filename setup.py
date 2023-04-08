@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='permuted_brunnermunzel',
       version='0.1',
@@ -7,7 +7,8 @@ setup(name='permuted_brunnermunzel',
       author='Matthew Corney',
       author_email='matthew_corney@yahoo.co.uk',
       license='MIT',
-      packages=['permuted_brunnermunzel'],
+      package_dir={'':"src"},
+      packages=find_packages("src"),
       install_requires=[
           'numpy', 'scipy',
       ],
