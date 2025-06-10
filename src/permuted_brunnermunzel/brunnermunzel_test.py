@@ -1,6 +1,7 @@
 from typing import Literal
 from typing import List
 from typing import Union
+from typing import Tuple
 import logging
 import math
 import numpy as np
@@ -183,7 +184,7 @@ def permuted_brunnermunzel(x: list,
                            y: list,
                            alternative: Literal["two_sided", "greater", "less"] = "two_sided",
                            nan_policy=Literal["propagate", "raise", "omit"],
-                           est: Literal["original", "difference"] = "original", force: bool = False) -> tuple:
+                           est: Literal["original", "difference"] = "original", force: bool = False) -> Tuple[float, float]:
     """
     Computes the permuted Brunner-Munzel test for independent two-sample problem.
 
