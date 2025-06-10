@@ -245,7 +245,7 @@ def permuted_brunnermunzel(x: list,
         pass
     else:
         pass
-    combinations_of_x = np.math.comb(length_x + length_y, length_x)
+    combinations_of_x = math.comb(length_x + length_y, length_x)
     all_data = x + y
     if alternative == "two_sided":
         alter = 1
