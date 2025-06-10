@@ -118,11 +118,11 @@ def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int
     length_y = length_total - length_x
     const = [0.5 * (length_x + 1), 0.5 * (length_y + 1), length_x / (length_x - 1), length_y / (length_y - 1)]
     ini = np.arange(1, length_x + 1)
-    idx = ini.copy()
+    idx = ini.tolist().copy()
     for i in range(combinations_of_x):
         stat = calc_statistics(length_x, length_y, all_data, const, idx)
         statistics.append(stat)
-        idx = combination(length_total, length_x, list(ini), idx)
+        idx = combination(length_total, length_x, ini.tolist(), idx)
     return statistics
 
 
