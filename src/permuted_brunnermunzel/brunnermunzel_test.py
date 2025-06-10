@@ -101,7 +101,7 @@ def calc_statistics(length_x: int, length_y: int, all_data: List[Union[int, floa
     return stat
 
 
-def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int, all_data: List[Union[float,int]]):
+def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int, all_data: List[Union[float, int]]):
     """
     Returns a list of permutation statistics for the given data by performing all possible
     combinations of size r on the data and calculating the statistic for each combination.
@@ -125,7 +125,7 @@ def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int
     return statistics
 
 
-def combination(length_total: int, length_x: int, ini: List[int], arr: List[Union[int,float]]):
+def combination(length_total: int, length_x: int, ini: List[int], arr: List[Union[int, float]]):
     """
     Computes the combination of `length_x` elements from a set of `length_total` elements, using the initial values
     in `ini` and returning the results in `arr`.The function works by computing the difference between the initial
@@ -183,7 +183,7 @@ def permuted_brunnermunzel(x: list,
                            y: list,
                            alternative: Literal["two_sided", "greater", "less"] = "two_sided",
                            nan_policy=Literal["propagate", "raise", "omit"],
-                           est: Literal["original", "difference"] = "original",force:bool=False):
+                           est: Literal["original", "difference"] = "original", force: bool = False) -> tuple:
     """
     Computes the permuted Brunner-Munzel test for independent two-sample problem.
 
@@ -238,7 +238,8 @@ def permuted_brunnermunzel(x: list,
         logging.error('Not Enough Observations')
         raise ValueError
     elif (length_x < 7) or (length_x < 7):
-        logging.warning('The permuted brunner-munzel test loses power with samples sizes with fewer than 7 observations')
+        logging.warning(
+            'The permuted brunner-munzel test loses power with samples sizes with fewer than 7 observations')
         pass
     elif (length_x > 10) or (length_x > 10):
         logging.warning('The normal brunner-munzel test is more suitable for samples of 10 or greater observations')
@@ -279,11 +280,8 @@ def permuted_brunnermunzel(x: list,
             if ge(statistics[i], statistics[0]):
                 count += 1
         pval = float(count) / combinations_of_x
-        res = {}
         if est == "original":
             estimate = pst
-            estimate_name = "P(X<Y)+.5*P(X=Y)"
         else:
-            estimate = res['pst'] * 2 - 1
-            estimate_name = "P(X<Y)-P(X>Y))"
-        return pst, pval
+            estimate = pst * 2 - 1
+        return estimate, pval
