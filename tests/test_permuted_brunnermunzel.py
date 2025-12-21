@@ -152,7 +152,28 @@ def test_rank(input_list, expected_output):
      'less',
      'omit',
      'original',
-     (0.8333333333333334, 0.0010822510822510823))
+     (0.8333333333333334, 0.0010822510822510823)),
+    # Test est="difference" parameter
+    ([0, 0, 0, 1, 1, 1, 0],
+     [30, 20, 19, 18, 15, 10, ],
+     'less',
+     'propagate',
+     'difference',
+     (0.7142857142857142, 0.0005827505827505828)),  # 0.8571... * 2 - 1
+    # Test NaN in y array with propagate
+    ([0, 0, 0, 1, 1, 1, 0],
+     [30, 20, np.nan, 18, 15, 10, ],
+     'two_sided',
+     'propagate',
+     'original',
+     (np.nan, np.nan)),
+    # Test NaN in y array with raise
+    ([0, 0, 0, 1, 1, 1, 0],
+     [30, 20, np.nan, 18, 15, 10, ],
+     'two_sided',
+     'raise',
+     'original',
+     ValueError),
 ])
 def test_permuted_brunnermunzel(x,
                                 y,
@@ -170,3 +191,9 @@ def test_permuted_brunnermunzel(x,
         np.testing.assert_allclose(pval, expected_output[1])
     except ValueError:
         assert expected_output==ValueError
+
+
+def test_package_import():
+    """Test that the package can be imported correctly."""
+    from permuted_brunnermunzel import permuted_brunnermunzel
+    assert callable(permuted_brunnermunzel)

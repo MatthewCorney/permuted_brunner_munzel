@@ -7,6 +7,12 @@ import math
 import numpy as np
 from scipy.stats import brunnermunzel
 
+# Constants
+FLOAT_TOLERANCE = 1e-15
+MIN_OBSERVATIONS = 2
+RECOMMENDED_MIN_SAMPLE = 7
+RECOMMENDED_MAX_SAMPLE = 10
+
 
 def ge(a: float, b: float) -> bool:
     """
@@ -23,7 +29,7 @@ def ge(a: float, b: float) -> bool:
     :return: True if a is greater than or equal to b (accounting for rounding
              errors), False otherwise.
     """
-    res = abs(a - b) < 1e-15 or a >= b
+    res = abs(a - b) < FLOAT_TOLERANCE or a >= b
     return res
 
 
@@ -90,12 +96,8 @@ def calc_statistics(length_x: int, length_y: int, all_data: List[Union[int, floa
 
     x_squared_deviation = (rank_x_y[:length_x] - rank_x - mean_rank_x + const[0]) ** 2
     y_squared_deviation = (rank_x_y[length_x:length_x + length_y] - rank_y - mean_rank_y + const[1]) ** 2
-    vx = 0
-    for i in range(length_x):
-        vx += x_squared_deviation[i]
-    vy = 0
-    for i in range(length_y):
-        vy += y_squared_deviation[i]
+    vx = np.sum(x_squared_deviation)
+    vy = np.sum(y_squared_deviation)
 
     v = const[2] * vx + const[3] * vy
     stat = (mean_rank_y - mean_rank_x) / np.sqrt(v)
@@ -114,7 +116,6 @@ def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int
     :return: A list of statistics calculated for each combination.
     """
     statistics = []
-    length_x = length_x
     length_y = length_total - length_x
     const = [0.5 * (length_x + 1), 0.5 * (length_y + 1), length_x / (length_x - 1), length_y / (length_y - 1)]
     ini = np.arange(1, length_x + 1)
@@ -166,24 +167,24 @@ def combination(length_total: int, length_x: int, ini: List[int], arr: List[Unio
     return arr
 
 
-def rank(x: list) -> np.ndarray[int]:
+def rank(x: list) -> np.ndarray:
     """
-    Returns the ranks of each element in the input list. The rank of an element
-    is defined as its index in the sorted list of elements, with ties assigned
-    the average rank.
+    Returns the argsort indices for the input list.
+
+    Returns an array of indices that would sort the input array.
+    For example, for input [5, 3, 2, 4, 1], returns [4, 2, 1, 3, 0]
+    meaning element at index 4 is smallest, index 2 is second smallest, etc.
 
     :param x: A list of numerical values.
-    :return: A list of the same length as `x`, containing the ranks of the input
-        elements.
+    :return: Array of indices that would sort the input.
     """
-    ranks = np.argsort(x)
-    return ranks
+    return np.argsort(x)
 
 
 def permuted_brunnermunzel(x: list,
                            y: list,
                            alternative: Literal["two_sided", "greater", "less"] = "two_sided",
-                           nan_policy=Literal["propagate", "raise", "omit"],
+                           nan_policy: Literal["propagate", "raise", "omit"] = "propagate",
                            est: Literal["original", "difference"] = "original", force: bool = False) -> Tuple[float, float]:
     """
     Computes the permuted Brunner-Munzel test for independent two-sample problem.
@@ -219,34 +220,30 @@ def permuted_brunnermunzel(x: list,
         - The first value is the estimated location shift between the two distributions (i.e., the P-value).
         - The second value is the P-value of the test.
     """
-    # Handeling of NaN in the samples
+    # Handling of NaN in the samples
     if nan_policy == 'raise':
-        if any([math.isnan(item) for item in x]):
+        if any(math.isnan(item) for item in x) or any(math.isnan(item) for item in y):
             logging.error(f'{nan_policy=} and array contains NaN values')
-            raise ValueError
+            raise ValueError("Input contains NaN values")
     elif nan_policy == 'omit':
         x = [item for item in x if not math.isnan(item)]
         y = [item for item in y if not math.isnan(item)]
     elif nan_policy == 'propagate':
-        if any([math.isnan(item) for item in x]):
+        if any(math.isnan(item) for item in x) or any(math.isnan(item) for item in y):
             logging.warning(f'{nan_policy=} and array contains NaN values')
             return np.nan, np.nan
     # deals with the Observation sizes
     length_x = len(x)
     length_y = len(y)
     length_total = int(length_x + length_y)
-    if (length_x == 1) or (length_y == 1):
+    if (length_x < MIN_OBSERVATIONS) or (length_y < MIN_OBSERVATIONS):
         logging.error('Not Enough Observations')
         raise ValueError
-    elif (length_x < 7) or (length_x < 7):
+    elif (length_x < RECOMMENDED_MIN_SAMPLE) or (length_y < RECOMMENDED_MIN_SAMPLE):
         logging.warning(
-            'The permuted brunner-munzel test loses power with samples sizes with fewer than 7 observations')
-        pass
-    elif (length_x > 10) or (length_x > 10):
-        logging.warning('The normal brunner-munzel test is more suitable for samples of 10 or greater observations')
-        pass
-    else:
-        pass
+            f'The permuted brunner-munzel test loses power with samples sizes with fewer than {RECOMMENDED_MIN_SAMPLE} observations')
+    elif (length_x > RECOMMENDED_MAX_SAMPLE) or (length_y > RECOMMENDED_MAX_SAMPLE):
+        logging.warning(f'The normal brunner-munzel test is more suitable for samples of {RECOMMENDED_MAX_SAMPLE} or greater observations')
     combinations_of_x = math.comb(length_x + length_y, length_x)
     all_data = x + y
     if alternative == "two_sided":
@@ -258,7 +255,7 @@ def permuted_brunnermunzel(x: list,
     else:
         logging.error(f"{alternative=} passed, alternative must be one of {Literal['two_sided', 'greater', 'less']}")
         raise ValueError
-    if not force and ():
+    if not force and (length_x > RECOMMENDED_MAX_SAMPLE and length_y > RECOMMENDED_MAX_SAMPLE):
         logging.error("Number of observations in both samples is over 10, defaulting to scipy brunner-munzel "
                       "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.brunnermunzel.html"
                       f"To stop this behaviour use the change {force=} to {True}")
@@ -276,10 +273,9 @@ def permuted_brunnermunzel(x: list,
             statistics = [-x for x in statistics[:combinations_of_x]]
         else:  # "less"
             statistics = statistics
-        count = 0
-        for i in range(combinations_of_x):
-            if ge(statistics[i], statistics[0]):
-                count += 1
+        reference = statistics[0]
+        statistics_array = np.array(statistics)
+        count = np.sum(statistics_array >= reference - FLOAT_TOLERANCE)
         pval = float(count) / combinations_of_x
         if est == "original":
             estimate = pst
