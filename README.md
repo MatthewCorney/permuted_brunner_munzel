@@ -1,46 +1,84 @@
-# Introduction
-This package is an implementation of the permuted version of the Brunner-Munzel test is a nonparametric test.
-The Permuted Brunner-Munzel is best suited to cases where the number of observations in one of the groups is below 10 and
-ideally above 7
+# Permuted Brunner-Munzel Test
 
-This is a reimplementation of the R/Fortran implementation found here https://cran.r-project.org/web/packages/brunnermunzel/index.html . This is for cases where is it not possible or complicated to call R from python
+[![PyPI version](https://badge.fury.io/py/permuted_brunnermunzel.svg)](https://pypi.org/project/permuted_brunnermunzel/)
+[![Tests](https://github.com/MatthewCorney/permuted_brunner_munzel/actions/workflows/tests.yml/badge.svg)](https://github.com/MatthewCorney/permuted_brunner_munzel/actions)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-# Dependencies
-The function requires the following Python packages:
+A Python implementation of the **permuted Brunner-Munzel test**, a nonparametric test for comparing two independent samples.
 
-- numpy
-- scipy
-- math
+## When to Use
 
-# Usage
-The function takes five input arguments, x, y, alternative, nan_policy, est, and force.
+The permuted Brunner-Munzel test is best suited for:
+- Small sample sizes (7-10 observations per group)
+- When standard parametric assumptions don't hold
+- Comparing distributions that may differ in shape, not just location
 
-- x and y are lists of observations for the two samples to be tested.
-- alternative specifies the alternative hypothesis to be tested, and can take one of the following values: "two_sided", "greater", or "less". Default is "two_sided".
-- nan_policy specifies how to handle missing values in the input data, and can take one of the following values: "propagate", "raise", or "omit". Default is "propagate".
-- est specifies the estimator of the difference of the location shifts of the two distributions, and can take one of the following values: "original" or "difference". Default is "original".
-- force specifies whether to force the use of the permuted Brunner-Munzel test even in cases where the normal Brunner-Munzel test would be more appropriate. Default is False.
+For larger samples (>10 per group), consider using `scipy.stats.brunnermunzel`.
 
-The function returns a tuple of two float values:
+## Installation
 
-- The first value is the estimated location shift between the two distributions (i.e., the P-value).
-- The second value is the P-value of the test.
-
-# Example
-```
+```bash
 pip install permuted_brunnermunzel
 ```
 
-```
+## Quick Start
+
+```python
 from permuted_brunnermunzel import permuted_brunnermunzel
 
+# Sample data
 x = [0, 0, 0, 1, 1, 1, 0]
-y = [30, 20, 19, 18, 15, 10, ]
+y = [30, 20, 19, 18, 15, 10]
 
-result = permuted_brunnermunzel(x, y, alternative="less", nan_policy="propagate", est="original", force=False)
-print(result)
+# Run the test
+estimate, pvalue = permuted_brunnermunzel(x, y, alternative="less")
+
+print(f"Effect size estimate: {estimate:.4f}")
+print(f"P-value: {pvalue:.6f}")
 ```
 
+**Output:**
 ```
-(0.8571428571428571, 0.0005827505827505828)
+Effect size estimate: 0.8571
+P-value: 0.000583
 ```
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `x` | list | required | First sample observations |
+| `y` | list | required | Second sample observations |
+| `alternative` | str | `"two_sided"` | `"two_sided"`, `"greater"`, or `"less"` |
+| `nan_policy` | str | `"propagate"` | `"propagate"`, `"raise"`, or `"omit"` |
+| `est` | str | `"original"` | `"original"` or `"difference"` |
+| `force` | bool | `False` | Force test even for large samples |
+
+## Returns
+
+| Value | Description |
+|-------|-------------|
+| `estimate` | Effect size: P(X < Y) + 0.5*P(X = Y) for `est="original"`, or P(X < Y) - P(X > Y) for `est="difference"` |
+| `pvalue` | The p-value for the test |
+
+## Interpreting Results
+
+- **estimate = 0.5**: No difference between groups
+- **estimate > 0.5**: Values in Y tend to be larger than X
+- **estimate < 0.5**: Values in X tend to be larger than Y
+- **pvalue < 0.05**: Statistically significant difference (at alpha=0.05)
+
+## Dependencies
+
+- numpy >=1.20
+- scipy >=1.7
+
+## References
+
+This is a Python reimplementation of the R package [brunnermunzel](https://cran.r-project.org/web/packages/brunnermunzel/).
+
+Brunner, E. and Munzel, U. (2000). *The nonparametric Behrens-Fisher problem: Asymptotic theory and a small-sample approximation.*
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
