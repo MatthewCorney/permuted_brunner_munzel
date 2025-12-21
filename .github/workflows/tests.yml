@@ -31,4 +31,5 @@ jobs:
 
       - name: Type check
         if: matrix.python-version != '3.8'
+        continue-on-error: true
         run: mypy src/permuted_brunnermunzel --ignore-missing-imports

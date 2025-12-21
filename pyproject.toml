@@ -53,11 +53,30 @@ testpaths = ["tests"]
 addopts = "-v --tb=short"
 
 [tool.ruff]
-line-length = 120
-target-version = "py38"
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "UP",  # pyupgrade
+]
+ignore = [
+  "E501",  # line length (handled by formatter if you use one)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["permuted_brunnermunzel"]
 
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = false
 warn_unused_ignores = true
 check_untyped_defs = true
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.14.10"
+
