@@ -1,6 +1,5 @@
 import logging
 import math
-from typing import Literal
 
 import numpy as np
 from scipy.stats import brunnermunzel
@@ -10,25 +9,6 @@ FLOAT_TOLERANCE = 1e-15
 MIN_OBSERVATIONS = 2
 RECOMMENDED_MIN_SAMPLE = 7
 RECOMMENDED_MAX_SAMPLE = 10
-
-
-def ge(a: float, b: float) -> bool:
-    """
-    Check if a >= b with floating-point tolerance.
-
-    Parameters
-    ----------
-    a : float
-        First value to compare.
-    b : float
-        Second value to compare.
-
-    Returns
-    -------
-    bool
-        True if a >= b (within FLOAT_TOLERANCE), False otherwise.
-    """
-    return abs(a - b) < FLOAT_TOLERANCE or a >= b
 
 
 def divide_groups(length_x: int, length_y: int, all_data: list[float], idx: list[int]):
@@ -74,11 +54,13 @@ def divide_groups(length_x: int, length_y: int, all_data: list[float], idx: list
             iy += 1
 
     new_x_y[0:length_x] = new_x[:]
-    new_x_y[length_x:(length_x + length_y)] = new_y[:]
+    new_x_y[length_x : (length_x + length_y)] = new_y[:]
     return new_x, new_y, new_x_y
 
 
-def calc_statistics(length_x: int, length_y: int, all_data: list[int | float], const: list, idx: list) -> float:
+def calc_statistics(
+    length_x: int, length_y: int, all_data: list[int | float], const: list, idx: list
+) -> float:
     """
     Calculate the Brunner-Munzel test statistic for a given permutation.
 
@@ -105,10 +87,12 @@ def calc_statistics(length_x: int, length_y: int, all_data: list[int | float], c
     rank_y = rank(new_y)
     rank_x_y = rank(new_x + new_y)
     mean_rank_x = np.mean(rank_x_y[:length_x])
-    mean_rank_y = np.mean(rank_x_y[length_x:length_x + length_y])
+    mean_rank_y = np.mean(rank_x_y[length_x : length_x + length_y])
 
     x_squared_deviation = (rank_x_y[:length_x] - rank_x - mean_rank_x + const[0]) ** 2
-    y_squared_deviation = (rank_x_y[length_x:length_x + length_y] - rank_y - mean_rank_y + const[1]) ** 2
+    y_squared_deviation = (
+        rank_x_y[length_x : length_x + length_y] - rank_y - mean_rank_y + const[1]
+    ) ** 2
     vx: np.floating = np.sum(x_squared_deviation)
     vy: np.floating = np.sum(y_squared_deviation)
 
@@ -117,7 +101,12 @@ def calc_statistics(length_x: int, length_y: int, all_data: list[int | float], c
     return stat
 
 
-def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int, all_data: list[float | int]):
+def bm_permutation_stat(
+    length_total: int,
+    length_x: int,
+    combinations_of_x: int,
+    all_data: list[float | int],
+):
     """
     Compute test statistics for all possible permutations.
 
@@ -142,7 +131,12 @@ def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int
     """
     statistics = []
     length_y = length_total - length_x
-    const = [0.5 * (length_x + 1), 0.5 * (length_y + 1), length_x / (length_x - 1), length_y / (length_y - 1)]
+    const = [
+        0.5 * (length_x + 1),
+        0.5 * (length_y + 1),
+        length_x / (length_x - 1),
+        length_y / (length_y - 1),
+    ]
     ini = np.arange(1, length_x + 1)
     idx = ini.tolist().copy()
     for _ in range(combinations_of_x):
@@ -152,7 +146,9 @@ def bm_permutation_stat(length_total: int, length_x: int, combinations_of_x: int
     return statistics
 
 
-def combination(length_total: int, length_x: int, ini: list[int], arr: list[int | float]):
+def combination(
+    length_total: int, length_x: int, ini: list[int], arr: list[int | float]
+):
     """
     Generate the next combination in lexicographic order.
 
@@ -216,11 +212,14 @@ def rank(x: list) -> np.ndarray:
     return np.argsort(x)
 
 
-def permuted_brunnermunzel(x: list,
-                           y: list,
-                           alternative: Literal["two_sided", "greater", "less"] = "two_sided",
-                           nan_policy: Literal["propagate", "raise", "omit"] = "propagate",
-                           est: Literal["original", "difference"] = "original", force: bool = False) -> tuple[float, float]:
+def permuted_brunnermunzel(
+    x: list,
+    y: list,
+    alternative: str = "two_sided",
+    nan_policy: str = "propagate",
+    est: str = "original",
+    force: bool = False,
+) -> tuple[float, float]:
     """
     Compute the permuted Brunner-Munzel test for two independent samples.
 
@@ -277,57 +276,63 @@ def permuted_brunnermunzel(x: list,
            problem: Asymptotic theory and a small-sample approximation.
     """
     # Handling of NaN in the samples
-    if nan_policy == 'raise':
+    if nan_policy == "raise":
         if any(math.isnan(item) for item in x) or any(math.isnan(item) for item in y):
-            logging.error(f'{nan_policy=} and array contains NaN values')
+            logging.error(f"{nan_policy=} and array contains NaN values")
             raise ValueError("Input contains NaN values")
-    elif nan_policy == 'omit':
+    elif nan_policy == "omit":
         x = [item for item in x if not math.isnan(item)]
         y = [item for item in y if not math.isnan(item)]
-    elif nan_policy == 'propagate':
+    elif nan_policy == "propagate":
         if any(math.isnan(item) for item in x) or any(math.isnan(item) for item in y):
-            logging.warning(f'{nan_policy=} and array contains NaN values')
+            logging.warning(f"{nan_policy=} and array contains NaN values")
             return np.nan, np.nan
-    # deals with the Observation sizes
+    # deals with the observation sizes
     length_x = len(x)
     length_y = len(y)
     length_total = int(length_x + length_y)
     if (length_x < MIN_OBSERVATIONS) or (length_y < MIN_OBSERVATIONS):
-        logging.error('Not Enough Observations')
+        logging.error("Not Enough Observations")
         raise ValueError
     elif (length_x < RECOMMENDED_MIN_SAMPLE) or (length_y < RECOMMENDED_MIN_SAMPLE):
         logging.warning(
-            f'The permuted brunner-munzel test loses power with samples sizes with fewer than {RECOMMENDED_MIN_SAMPLE} observations')
+            f"The permuted brunner-munzel test loses power with samples sizes with fewer than {RECOMMENDED_MIN_SAMPLE} observations"
+        )
     elif (length_x > RECOMMENDED_MAX_SAMPLE) or (length_y > RECOMMENDED_MAX_SAMPLE):
-        logging.warning(f'The normal brunner-munzel test is more suitable for samples of {RECOMMENDED_MAX_SAMPLE} or greater observations')
+        logging.warning(
+            f"The normal brunner-munzel test is more suitable for samples of {RECOMMENDED_MAX_SAMPLE} or greater observations"
+        )
     combinations_of_x = math.comb(length_x + length_y, length_x)
     all_data = x + y
-    if alternative == "two_sided":
-        alter = 1
-    elif alternative == "greater":
-        alter = 2
-    elif alternative == "less":
-        alter = 3
-    else:
-        logging.error(f"{alternative=} passed, alternative must be one of {Literal['two_sided', 'greater', 'less']}")
+    if alternative not in ("two_sided", "greater", "less"):
+        logging.error(
+            f"{alternative=} passed, alternative must be one of 'two_sided', 'greater', 'less'"
+        )
         raise ValueError
-    if not force and (length_x > RECOMMENDED_MAX_SAMPLE and length_y > RECOMMENDED_MAX_SAMPLE):
-        logging.error("Number of observations in both samples is over 10, defaulting to scipy brunner-munzel "
-                      "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.brunnermunzel.html"
-                      f"To stop this behaviour use the change {force=} to {True}")
-        pst, p_value = brunnermunzel(x, y, alternative=alternative)
-        return pst, p_value
+    if not force and (
+        length_x > RECOMMENDED_MAX_SAMPLE and length_y > RECOMMENDED_MAX_SAMPLE
+    ):
+        logging.error(
+            "Number of observations in both samples is over 10, defaulting to scipy brunner-munzel "
+            "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.brunnermunzel.html"
+            f"To stop this behaviour use the change {force=} to {True}"
+        )
+        # scipy uses "two-sided" (hyphen) vs our "two_sided" (underscore)
+        scipy_alt = "two-sided" if alternative == "two_sided" else alternative
+        result = brunnermunzel(x, y, alternative=scipy_alt)
+        return float(result.statistic), float(result.pvalue)
     else:
         rank_all_data = rank(all_data)
         mean_rank_y = np.mean(rank_all_data[length_x:length_total])
         pst = (mean_rank_y - (length_total - length_x + 1) * 0.5) / length_x
-        statistics = bm_permutation_stat(length_total, length_x, combinations_of_x, all_data)
-        if alter == 1:  # "two sided"
-            statistics = [abs(x) for x in statistics[:combinations_of_x]]
-        elif alter == 2:  # "greater"
-            statistics = [-x for x in statistics[:combinations_of_x]]
-        else:  # "less"
-            statistics = statistics
+        statistics = bm_permutation_stat(
+            length_total, length_x, combinations_of_x, all_data
+        )
+        if alternative == "two_sided":
+            statistics = [abs(s) for s in statistics]
+        elif alternative == "greater":
+            statistics = [-s for s in statistics]
+        # else: "less" - no transformation needed
         reference = statistics[0]
         statistics_array = np.array(statistics)
         count: np.integer = np.sum(statistics_array >= reference - FLOAT_TOLERANCE)
