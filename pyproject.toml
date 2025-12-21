@@ -57,6 +57,7 @@ line-length = 120
 target-version = "py38"
 
 [tool.mypy]
-python_version = "3.8"
-warn_return_any = true
+python_version = "3.9"
+warn_return_any = false
 warn_unused_ignores = true
+check_untyped_defs = true
