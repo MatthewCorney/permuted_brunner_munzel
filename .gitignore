@@ -26,5 +26,9 @@ htmlcov/
 .venv/
 venv/
 
+# Lock files (not needed for libraries)
+poetry.lock
+uv.lock
+
 # Claude Code
 .claude/
