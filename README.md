@@ -3,6 +3,8 @@
 [![PyPI version](https://badge.fury.io/py/permuted_brunnermunzel.svg)](https://pypi.org/project/permuted_brunnermunzel/)
 [![Tests](https://github.com/MatthewCorney/permuted_brunner_munzel/actions/workflows/tests.yml/badge.svg)](https://github.com/MatthewCorney/permuted_brunner_munzel/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 A Python implementation of the **permuted Brunner-Munzel test**, a nonparametric test for comparing two independent samples.
 
